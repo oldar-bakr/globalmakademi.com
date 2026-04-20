@@ -117,8 +117,32 @@ document.addEventListener('DOMContentLoaded', function () {
   if (contactForm) {
     contactForm.addEventListener('submit', function (e) {
       e.preventDefault();
-      if (formPanel) formPanel.style.display = 'none';
-      if (successPanel) successPanel.style.display = 'flex';
+      var data = new FormData(contactForm);
+      var action = contactForm.getAttribute('action');
+      var submitBtn = contactForm.querySelector('button[type="submit"]');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending...';
+      }
+      fetch(action, {
+        method: 'POST',
+        body: data,
+        headers: { 'Accept': 'application/json' }
+      }).then(function (res) {
+        if (res.ok) {
+          if (formPanel) formPanel.style.display = 'none';
+          if (successPanel) successPanel.style.display = 'flex';
+        } else {
+          alert('Something went wrong. Please try again or email us directly at info@globalmakademi.com');
+        }
+      }).catch(function () {
+        alert('Network error. Please try again or email us directly at info@globalmakademi.com');
+      }).finally(function () {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Send Message';
+        }
+      });
     });
   }
 
