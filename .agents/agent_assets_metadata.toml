@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "ZSYUh5hyldaTO-aNogr9D"
+uri = "file://makademi-website.zip"
+type = "unspecified"
+title = "Makademi Training Hub - Static Website (ZIP)"

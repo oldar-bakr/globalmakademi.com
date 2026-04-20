@@ -25,3 +25,15 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - `pnpm --filter @workspace/api-server run dev` — run API server locally
 
 See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details.
+
+## Static Deliverable: Makademi Training Hub
+
+A plain HTML/CSS/JS static website rebuild of the React Makademi Training Hub portal.
+
+- **Directory**: `makademi-website/`
+- **Downloadable**: `makademi-website.zip` (4.8 MB)
+- **Pages**: 7 HTML files (index, courses, about, contact, 404, and 2 course detail pages)
+- **Courses**: 101 programs with client-side search and category filtering
+- **Design**: Navy (#00234B) + Gold (#D4AF37) palette, Inter + DM Sans typography
+- **No build step**: Upload directly to Hostinger File Manager
+- **Contact form**: FormSubmit.co integration (see README.txt for alternatives)
