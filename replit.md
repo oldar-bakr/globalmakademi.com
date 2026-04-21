@@ -37,3 +37,7 @@ A plain HTML/CSS/JS static website rebuild of the React Makademi Training Hub po
 - **Design**: Navy (#00234B) + Gold (#D4AF37) palette, Inter + DM Sans typography
 - **No build step**: Upload directly to Hostinger File Manager
 - **Contact form**: FormSubmit.co integration (see README.txt for alternatives)
+
+### Workspace Preview
+
+The static site is also served live in the workspace Preview pane via the `makademi-portal` artifact (`artifacts/makademi-portal/`), a Vite dev server with a custom middleware plugin that serves files from `makademi-website/` at the root path. Extensionless URLs like `/courses` resolve to `courses.html`, and unknown paths fall back to `404.html`. The `api-server` artifact still owns `/api`.
