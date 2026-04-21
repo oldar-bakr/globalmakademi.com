@@ -202,12 +202,56 @@
           <h2 style="font-size:1.875rem;font-weight:700;color:var(--navy);margin-bottom:1rem">Our Facilities &amp; Events</h2>
           <p style="color:var(--slate-600);font-size:1.125rem">A glimpse into our world-class training facilities and the events that bring industry professionals together.</p>
         </div>
-        <div class="gallery-grid">
-          <div class="placeholder span-2-col span-2-row"><span>Place image here</span></div>
-          <div class="placeholder"><span>Place image here</span></div>
-          <div class="placeholder"><span>Place image here</span></div>
-          <div class="placeholder span-2-col"><span>Place image here</span></div>
+        <div class="gallery-grid" id="firefighter-gallery">
+          <div class="placeholder gallery-cycle span-2-col span-2-row" data-start="0">
+            <img src="assets/images/gallery/firefighter-1.jpeg" alt="Firefighter training" class="is-active">
+            <img src="assets/images/gallery/firefighter-2.jpeg" alt="Firefighter training">
+            <img src="assets/images/gallery/firefighter-3.jpeg" alt="Firefighter training">
+            <img src="assets/images/gallery/firefighter-4.jpeg" alt="Firefighter training">
+            <img src="assets/images/gallery/firefighter-5.jpeg" alt="Firefighter training">
+            <img src="assets/images/gallery/firefighter-6.jpeg" alt="Firefighter training">
+          </div>
+          <div class="placeholder gallery-cycle" data-start="2">
+            <img src="assets/images/gallery/firefighter-1.jpeg" alt="Firefighter training">
+            <img src="assets/images/gallery/firefighter-2.jpeg" alt="Firefighter training">
+            <img src="assets/images/gallery/firefighter-3.jpeg" alt="Firefighter training" class="is-active">
+            <img src="assets/images/gallery/firefighter-4.jpeg" alt="Firefighter training">
+            <img src="assets/images/gallery/firefighter-5.jpeg" alt="Firefighter training">
+            <img src="assets/images/gallery/firefighter-6.jpeg" alt="Firefighter training">
+          </div>
+          <div class="placeholder gallery-cycle" data-start="4">
+            <img src="assets/images/gallery/firefighter-1.jpeg" alt="Firefighter training">
+            <img src="assets/images/gallery/firefighter-2.jpeg" alt="Firefighter training">
+            <img src="assets/images/gallery/firefighter-3.jpeg" alt="Firefighter training">
+            <img src="assets/images/gallery/firefighter-4.jpeg" alt="Firefighter training">
+            <img src="assets/images/gallery/firefighter-5.jpeg" alt="Firefighter training" class="is-active">
+            <img src="assets/images/gallery/firefighter-6.jpeg" alt="Firefighter training">
+          </div>
+          <div class="placeholder gallery-cycle span-2-col" data-start="1">
+            <img src="assets/images/gallery/firefighter-1.jpeg" alt="Firefighter training">
+            <img src="assets/images/gallery/firefighter-2.jpeg" alt="Firefighter training" class="is-active">
+            <img src="assets/images/gallery/firefighter-3.jpeg" alt="Firefighter training">
+            <img src="assets/images/gallery/firefighter-4.jpeg" alt="Firefighter training">
+            <img src="assets/images/gallery/firefighter-5.jpeg" alt="Firefighter training">
+            <img src="assets/images/gallery/firefighter-6.jpeg" alt="Firefighter training">
+          </div>
         </div>
+        <script>
+          (function(){
+            var blocks = document.querySelectorAll('#firefighter-gallery .gallery-cycle');
+            blocks.forEach(function(el, idx){
+              var imgs = el.querySelectorAll('img');
+              var i = (parseInt(el.dataset.start || '0', 10)) % imgs.length;
+              setTimeout(function(){
+                setInterval(function(){
+                  imgs[i].classList.remove('is-active');
+                  i = (i + 1) % imgs.length;
+                  imgs[i].classList.add('is-active');
+                }, 4500);
+              }, idx * 1100);
+            });
+          })();
+        </script>
       </div>
     </section>
 
