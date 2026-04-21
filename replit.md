@@ -41,3 +41,5 @@ A plain HTML/CSS/JS static website rebuild of the React Makademi Training Hub po
 ### Workspace Preview
 
 The static site is also served live in the workspace Preview pane via the `makademi-portal` artifact (`artifacts/makademi-portal/`), a Vite dev server with a custom middleware plugin that serves files from `makademi-website/` at the root path. Extensionless URLs like `/courses` resolve to `courses.html`, and unknown paths fall back to `404.html`. The `api-server` artifact still owns `/api`.
+
+The Preview pane also injects the [Agentation](https://www.npmjs.com/package/agentation) visual feedback toolbar into every served HTML response on the fly (via `src/agentation-init.tsx`). The on-disk files in `makademi-website/` are never modified, so the Hostinger zip stays clean. To use the toolbar to send annotations to a coding agent, the user must run the Agentation MCP server locally (`npx add-mcp` adds `agentation-mcp`).

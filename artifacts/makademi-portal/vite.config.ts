@@ -1,4 +1,5 @@
 import { defineConfig, type Plugin } from "vite";
+import react from "@vitejs/plugin-react";
 import fs from "fs";
 import path from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
@@ -47,12 +48,30 @@ const mimeTypes: Record<string, string> = {
   ".txt": "text/plain; charset=utf-8",
 };
 
+const AGENTATION_SCRIPT_TAG =
+  '<script type="module" src="/src/agentation-init.tsx" data-agentation-injected></script>';
+
+function injectAgentation(html: string): string {
+  if (html.includes("data-agentation-injected")) return html;
+  if (html.includes("</body>")) {
+    return html.replace("</body>", `  ${AGENTATION_SCRIPT_TAG}\n</body>`);
+  }
+  return html + "\n" + AGENTATION_SCRIPT_TAG + "\n";
+}
+
 function sendFile(res: any, filePath: string, status = 200) {
   const ext = path.extname(filePath).toLowerCase();
   const type = mimeTypes[ext] || "application/octet-stream";
   res.statusCode = status;
   res.setHeader("Content-Type", type);
   res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+  if (ext === ".html") {
+    const html = fs.readFileSync(filePath, "utf8");
+    const out = injectAgentation(html);
+    res.setHeader("Content-Length", Buffer.byteLength(out));
+    res.end(out);
+    return;
+  }
   fs.createReadStream(filePath).pipe(res);
 }
 
@@ -68,6 +87,15 @@ function safeResolve(rel: string): string | null {
   return null;
 }
 
+function send404(res: any) {
+  const fallback = safeResolve("/404.html");
+  if (fallback && fs.existsSync(fallback)) {
+    return sendFile(res, fallback, 404);
+  }
+  res.statusCode = 404;
+  res.end();
+}
+
 function makademiStaticPlugin(): Plugin {
   return {
     name: "makademi-static",
@@ -81,11 +109,23 @@ function makademiStaticPlugin(): Plugin {
         try {
           pathname = decodeURIComponent(url.pathname);
         } catch {
-          return next();
+          return send404(res);
         }
-        if (pathname.includes("\0")) return next();
+        if (pathname.includes("\0")) return send404(res);
 
-        if (pathname.startsWith("/@") || pathname.startsWith("/__vite")) {
+        if (
+          pathname.split("/").some((seg) => seg === "..") ||
+          /(?:^|[/\\])\.\.(?:[/\\]|$)/.test(pathname)
+        ) {
+          return send404(res);
+        }
+
+        if (
+          pathname.startsWith("/@") ||
+          pathname.startsWith("/__vite") ||
+          pathname.startsWith("/src/") ||
+          pathname.startsWith("/node_modules/")
+        ) {
           return next();
         }
 
@@ -94,7 +134,7 @@ function makademiStaticPlugin(): Plugin {
           if (indexPath && fs.existsSync(indexPath)) {
             return sendFile(res, indexPath);
           }
-          return next();
+          return send404(res);
         }
 
         if (pathname.endsWith("/")) {
@@ -109,7 +149,7 @@ function makademiStaticPlugin(): Plugin {
           if (indexPath && fs.existsSync(indexPath)) {
             return sendFile(res, indexPath);
           }
-          return next();
+          return send404(res);
         }
 
         if (!path.extname(pathname)) {
@@ -128,11 +168,15 @@ function makademiStaticPlugin(): Plugin {
           return sendFile(res, filePath);
         }
 
-        const fallback = safeResolve("/404.html");
-        if (fallback && fs.existsSync(fallback)) {
-          return sendFile(res, fallback, 404);
+        const ext = path.extname(pathname);
+        if (ext === "" || ext === ".html") {
+          const fallback = safeResolve("/404.html");
+          if (fallback && fs.existsSync(fallback)) {
+            return sendFile(res, fallback, 404);
+          }
         }
-        next();
+        res.statusCode = 404;
+        res.end();
       });
     },
   };
@@ -142,6 +186,7 @@ export default defineConfig({
   base: basePath,
   plugins: [
     makademiStaticPlugin(),
+    react(),
     runtimeErrorOverlay(),
     ...(process.env.NODE_ENV !== "production" &&
     process.env.REPL_ID !== undefined
@@ -169,8 +214,13 @@ export default defineConfig({
     host: "0.0.0.0",
     allowedHosts: true,
     fs: {
-      strict: false,
-      allow: [path.resolve(import.meta.dirname, "..", "..")],
+      strict: true,
+      allow: [
+        path.resolve(import.meta.dirname),
+        staticRoot,
+        path.resolve(import.meta.dirname, "..", "..", "node_modules"),
+      ],
+      deny: [".env", ".env.*", "*.{crt,pem}", "**/.git/**"],
     },
   },
   preview: {
