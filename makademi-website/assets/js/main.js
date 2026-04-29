@@ -135,12 +135,31 @@ document.addEventListener('DOMContentLoaded', function () {
   var formPanel = document.getElementById('form-panel');
   var successPanel = document.getElementById('success-panel');
 
+  function showContactSuccess() {
+    if (formPanel) formPanel.style.display = 'none';
+    if (successPanel) {
+      successPanel.style.display = 'flex';
+      if (successPanel.scrollIntoView) {
+        successPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  }
+
   if (contactForm) {
     contactForm.addEventListener('submit', function (e) {
       e.preventDefault();
+      // Mirror the visitor's email into the hidden _replyto field so
+      // FormSubmit sets Reply-To deterministically (independent of its
+      // automatic field-name detection).
+      var emailInput = document.getElementById('email');
+      var replytoMirror = document.getElementById('replyto-mirror');
+      if (emailInput && replytoMirror) {
+        replytoMirror.value = emailInput.value;
+      }
       var data = new FormData(contactForm);
       var action = contactForm.getAttribute('action');
       var submitBtn = contactForm.querySelector('button[type="submit"]');
+      var originalLabel = submitBtn ? submitBtn.textContent : '';
       if (submitBtn) {
         submitBtn.disabled = true;
         submitBtn.textContent = 'Sending...';
@@ -151,8 +170,7 @@ document.addEventListener('DOMContentLoaded', function () {
         headers: { 'Accept': 'application/json' }
       }).then(function (res) {
         if (res.ok) {
-          if (formPanel) formPanel.style.display = 'none';
-          if (successPanel) successPanel.style.display = 'flex';
+          showContactSuccess();
         } else {
           alert('Something went wrong. Please try again or email us directly at info@globalmakademi.com');
         }
@@ -161,9 +179,22 @@ document.addEventListener('DOMContentLoaded', function () {
       }).finally(function () {
         if (submitBtn) {
           submitBtn.disabled = false;
-          submitBtn.textContent = 'Send Message';
+          submitBtn.textContent = originalLabel || 'Submit Inquiry';
         }
       });
+    });
+
+    // No-JS fallback: FormSubmit redirects to contact.html#thanks. When the
+    // page loads with that hash (or the hash changes to it later), swap
+    // straight to the success panel so the visitor never lands on a
+    // blank-looking form.
+    if (window.location.hash === '#thanks') {
+      showContactSuccess();
+    }
+    window.addEventListener('hashchange', function () {
+      if (window.location.hash === '#thanks') {
+        showContactSuccess();
+      }
     });
   }
 
@@ -173,6 +204,9 @@ document.addEventListener('DOMContentLoaded', function () {
       if (formPanel) formPanel.style.display = 'block';
       if (successPanel) successPanel.style.display = 'none';
       if (contactForm) contactForm.reset();
+      if (window.location.hash === '#thanks' && window.history && window.history.replaceState) {
+        window.history.replaceState(null, '', window.location.pathname + window.location.search);
+      }
     });
   }
 

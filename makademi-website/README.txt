@@ -63,21 +63,24 @@ Each .html file is self-contained. Open any file in a text editor
 CONTACT FORM
 -------------
 
-The contact form currently submits to FormSubmit.co (a free service).
-To change this:
+The contact form on contact.html submits to FormSubmit.co (a free service)
+and delivers each inquiry to info@globalmakademi.com with a clean subject
+line, a Reply-To set to the visitor's address, and every field laid out
+as a readable table.
 
-Option A: FormSubmit (free, no setup)
-  - The form already points to FormSubmit. It should work on first submit
-    (FormSubmit will ask for email verification on the first submission).
+IMPORTANT: FormSubmit needs a one-time activation click on the inbox
+before any mail starts flowing. The full step-by-step guide is in:
 
-Option B: Hostinger form handler
-  - Replace the form action with your Hostinger form processing URL.
-  - Hostinger hPanel > Emails > set up email forwarding if needed.
+  CONTACT_FORM_SETUP.md
 
-Option C: mailto fallback
-  - Change the form tag to:
-    <form action="mailto:info@globalmakademi.com" method="POST" enctype="text/plain">
-  - This opens the user's email client. Less polished but always works.
+Read that file before going live.
+
+To change the destination email later:
+  - Edit contact.html, find:
+      action="https://formsubmit.co/info@globalmakademi.com"
+    and replace the address.
+  - Re-upload contact.html and redo the FormSubmit activation step
+    (described in CONTACT_FORM_SETUP.md) for the new address.
 
 
 CUSTOM 404 PAGE

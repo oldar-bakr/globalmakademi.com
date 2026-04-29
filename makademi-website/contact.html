@@ -137,24 +137,37 @@
               <h2 style="font-size:1.5rem;font-weight:700;color:var(--navy);margin-bottom:2rem">Send us a Message</h2>
 
               <!--
-                HOSTINGER / FormSubmit OPTION:
-                Replace the form action with your preferred handler:
-                  action="https://formsubmit.co/YOUR_EMAIL" method="POST"
-                Or use Hostinger's built-in form handler.
-                The current setup uses a mailto fallback + JS success panel.
+                Email delivery is handled by FormSubmit (https://formsubmit.co).
+                See CONTACT_FORM_SETUP.md for the one-time activation step
+                (FormSubmit sends a verification email the first time the form
+                is submitted from the live domain — click the link inside it
+                to start receiving inquiries).
               -->
-              <form id="contact-form" action="https://formsubmit.co/info@globalmakademi.com" method="POST">
+              <form id="contact-form" action="https://formsubmit.co/4a25594be38072bdab39513b617f5846" method="POST">
+                <!-- FormSubmit meta fields -->
+                <input type="hidden" name="_subject" value="New inquiry from globalmakademi.com">
+                <input type="hidden" name="_template" value="table">
                 <input type="hidden" name="_captcha" value="false">
-                <input type="hidden" name="_next" value="">
+                <input type="hidden" name="_next" value="https://globalmakademi.com/contact.html#thanks">
+                <!--
+                  Reply-To: the JS submit handler in assets/js/main.js mirrors
+                  the email input into this hidden field on submit, so the
+                  delivered email's Reply-To always points at the visitor.
+                  In the rare no-JS fallback path, FormSubmit also auto-detects
+                  the lowercase `email` field below.
+                -->
+                <input type="hidden" name="_replyto" id="replyto-mirror" value="">
+                <!-- Honeypot: real users leave this empty; bots fill it and FormSubmit drops the message. -->
+                <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
 
                 <div class="form-grid" style="margin-bottom:1.5rem">
                   <div class="form-group">
                     <label for="name" class="label">Full Name *</label>
-                    <input type="text" id="name" name="name" required class="input">
+                    <input type="text" id="name" name="Full Name" required class="input">
                   </div>
                   <div class="form-group">
                     <label for="company" class="label">Company / Organization *</label>
-                    <input type="text" id="company" name="company" required class="input">
+                    <input type="text" id="company" name="Company" required class="input">
                   </div>
                 </div>
 
@@ -165,31 +178,31 @@
                   </div>
                   <div class="form-group">
                     <label for="phone" class="label">Phone Number</label>
-                    <input type="tel" id="phone" name="phone" class="input">
+                    <input type="tel" id="phone" name="Phone" class="input">
                   </div>
                 </div>
 
                 <div class="form-grid" style="margin-bottom:1.5rem">
                   <div class="form-group">
                     <label for="industry" class="label">Industry</label>
-                    <select id="industry" name="industry" class="input select-native">
-                      <option value="oil-gas" selected>Oil &amp; Gas</option>
-                      <option value="energy">Energy</option>
-                      <option value="automotive">Automotive</option>
-                      <option value="hse">HSE / Safety</option>
-                      <option value="government">Government</option>
-                      <option value="other">Other</option>
+                    <select id="industry" name="Industry" class="input select-native">
+                      <option value="Oil & Gas" selected>Oil &amp; Gas</option>
+                      <option value="Energy">Energy</option>
+                      <option value="Automotive">Automotive</option>
+                      <option value="HSE / Safety">HSE / Safety</option>
+                      <option value="Government">Government</option>
+                      <option value="Other">Other</option>
                     </select>
                   </div>
                   <div class="form-group">
                     <label for="subject" class="label">Subject</label>
-                    <input type="text" id="subject" name="subject" class="input">
+                    <input type="text" id="subject" name="Subject" class="input">
                   </div>
                 </div>
 
                 <div class="form-group" style="margin-bottom:1.5rem">
                   <label for="message" class="label">Message *</label>
-                  <textarea id="message" name="message" required rows="6" placeholder="Please provide details about your training requirements..." class="textarea"></textarea>
+                  <textarea id="message" name="Message" required rows="6" placeholder="Please provide details about your training requirements..." class="textarea"></textarea>
                 </div>
 
                 <button type="submit" class="btn btn-gold btn-full btn-lg">Submit Inquiry</button>
@@ -197,6 +210,7 @@
             </div>
 
             <div id="success-panel" class="success-panel" style="display:none">
+              <a id="thanks" aria-hidden="true" tabindex="-1" style="position:absolute"></a>
               <div class="check-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
               </div>
