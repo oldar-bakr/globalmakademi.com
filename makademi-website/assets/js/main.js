@@ -205,4 +205,78 @@ document.addEventListener('DOMContentLoaded', function () {
   if (subjectParam && subjectInput) {
     subjectInput.value = subjectParam;
   }
+
+  // ===== LIGHTBOX (gallery) =====
+  var lightbox = document.getElementById('lightbox');
+  var lightboxImage = document.getElementById('lightbox-image');
+  var lightboxCaption = document.getElementById('lightbox-caption');
+  var photoTiles = document.querySelectorAll('.photo-tile');
+
+  if (lightbox && lightboxImage && photoTiles.length) {
+    var tilesArray = Array.prototype.slice.call(photoTiles);
+    var currentIndex = -1;
+    var lastFocused = null;
+
+    function showAt(idx) {
+      if (idx < 0) idx = tilesArray.length - 1;
+      if (idx >= tilesArray.length) idx = 0;
+      currentIndex = idx;
+      var tile = tilesArray[idx];
+      lightboxImage.src = tile.getAttribute('data-lightbox-src') || '';
+      lightboxImage.alt = tile.getAttribute('data-lightbox-caption') || '';
+      if (lightboxCaption) {
+        lightboxCaption.textContent = tile.getAttribute('data-lightbox-caption') || '';
+      }
+    }
+
+    function openLightbox(idx) {
+      lastFocused = document.activeElement;
+      showAt(idx);
+      lightbox.hidden = false;
+      document.body.style.overflow = 'hidden';
+      var closeBtn = lightbox.querySelector('[data-lightbox-close]');
+      if (closeBtn) closeBtn.focus();
+    }
+
+    function closeLightbox() {
+      lightbox.hidden = true;
+      lightboxImage.src = '';
+      document.body.style.overflow = '';
+      if (lastFocused && typeof lastFocused.focus === 'function') {
+        lastFocused.focus();
+      }
+      currentIndex = -1;
+    }
+
+    tilesArray.forEach(function (tile, i) {
+      tile.addEventListener('click', function () { openLightbox(i); });
+    });
+
+    var closeBtn = lightbox.querySelector('[data-lightbox-close]');
+    var prevBtn = lightbox.querySelector('[data-lightbox-prev]');
+    var nextBtn = lightbox.querySelector('[data-lightbox-next]');
+    if (closeBtn) closeBtn.addEventListener('click', closeLightbox);
+    if (prevBtn) prevBtn.addEventListener('click', function () { showAt(currentIndex - 1); });
+    if (nextBtn) nextBtn.addEventListener('click', function () { showAt(currentIndex + 1); });
+
+    lightbox.addEventListener('click', function (e) {
+      if (e.target === lightbox) closeLightbox();
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (lightbox.hidden) return;
+      if (e.key === 'Escape') { e.preventDefault(); closeLightbox(); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); showAt(currentIndex - 1); }
+      else if (e.key === 'ArrowRight') { e.preventDefault(); showAt(currentIndex + 1); }
+      else if (e.key === 'Tab') {
+        // Simple focus trap among the lightbox controls
+        var focusables = [closeBtn, prevBtn, nextBtn].filter(Boolean);
+        if (!focusables.length) return;
+        var idx = focusables.indexOf(document.activeElement);
+        e.preventDefault();
+        var nextIdx = e.shiftKey ? (idx <= 0 ? focusables.length - 1 : idx - 1) : ((idx + 1) % focusables.length);
+        focusables[nextIdx].focus();
+      }
+    });
+  }
 });
