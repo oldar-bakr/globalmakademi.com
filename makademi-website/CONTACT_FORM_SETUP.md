@@ -135,3 +135,69 @@ If the second inquiry arrives, the form is fully live. You're done.
 - Replace the `<form action="...">` URL with a Hostinger-hosted PHP
   `mail()` script or another provider. The rest of the form (fields,
   JS handler, success panel) does not need to change.
+
+---
+
+## Auto-confirmation email (sent to the visitor)
+
+In addition to the inquiry that lands in **info@globalmakademi.com**, the
+form also sends a polished **thank-you email back to the visitor** the
+moment they submit. This is FormSubmit's `_autoresponse` feature — no
+separate setup is needed; it activates as soon as the inbox itself is
+activated (Step 3 above).
+
+The visitor receives an email that:
+
+- comes **From:** `no-reply@formsubmit.co` *(see "Sender address" note
+  below — this is a FormSubmit free-tier limitation, not a bug)*
+- is addressed to whatever they typed into the *Business Email* field
+- thanks them for contacting Global Makademi, sets a 24-hour response
+  expectation, and lists the office phone (+90 212 337 37 74) and the
+  `info@globalmakademi.com` reply address in case they want to chase
+  it directly
+
+This both reassures the visitor that their message arrived and gives
+them a real human channel if their request is urgent.
+
+> **Sender address — important.** Ideally the auto-reply would be
+> sent **From:** `info@globalmakademi.com` so the visitor sees the
+> Global Makademi brand directly in their inbox. FormSubmit's free
+> tier does **not** allow a custom `From` address — every message it
+> sends originates from `no-reply@formsubmit.co`. The body of the
+> auto-reply makes the real Global Makademi identity (team name,
+> phone, `info@globalmakademi.com`, postal address) very prominent so
+> the visitor still recognises who the email is from. If a custom
+> sender domain becomes a hard requirement, the options are:
+>
+> 1. Upgrade to a paid FormSubmit plan that supports custom `From`,
+>    or
+> 2. Replace FormSubmit with a Hostinger-hosted PHP `mail()` script
+>    or a transactional-email provider (Postmark, SendGrid, Resend,
+>    etc.) configured to send from `info@globalmakademi.com`.
+>    See the troubleshooting entry "FormSubmit went down…" above for
+>    the migration shape.
+
+### Editing the auto-reply copy
+
+Open `contact.html` and find the hidden field that starts with:
+
+```html
+<input type="hidden" name="_autoresponse" value="Hello,
+…
+```
+
+Edit the text inside the `value="…"` attribute. Line breaks inside the
+attribute are preserved as paragraph breaks in the delivered email, so
+you can keep or reshape the layout freely. After saving, re-upload
+`contact.html` (or rebuild `makademi-website.zip`) — no FormSubmit
+re-activation is needed for copy changes.
+
+> **Note on the subject line.** FormSubmit does not let us customise
+> the subject of the auto-reply on the free tier; it ships as a generic
+> "Thanks for the message!" line. The `_subject` field at the top of
+> the form only controls the inquiry that comes to **us**, not the
+> auto-reply that goes to the visitor.
+
+> **Currently English only.** If you would like a Turkish version (or
+> auto-language detection based on the visitor's browser), say the
+> word and we will add a follow-up to wire that up.

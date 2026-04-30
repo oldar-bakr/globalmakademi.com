@@ -157,6 +157,30 @@
                   the lowercase `email` field below.
                 -->
                 <input type="hidden" name="_replyto" id="replyto-mirror" value="">
+                <!--
+                  Auto-response: FormSubmit emails the visitor a copy of this
+                  message right after they submit the form, using the address
+                  they typed into the email field. To edit the wording, just
+                  change the `value` below — see CONTACT_FORM_SETUP.md
+                  ("Auto-confirmation email") for guidance.
+                -->
+                <input type="hidden" name="_autoresponse" value="Hello,
+
+Thank you for contacting Global Makademi. We have received your inquiry and one of our training consultants will reply personally within 24 hours (Monday to Friday, Istanbul time).
+
+If your request is urgent, you can reach us directly:
+  Phone: +90 212 337 37 74
+  Email: info@globalmakademi.com
+
+While you wait, you are welcome to browse our full programme catalogue at https://globalmakademi.com/courses.html or learn more about us at https://globalmakademi.com/about.html.
+
+Warm regards,
+The Global Makademi Team
+Makademi Training and Consultancy ltd
+Çukur Mahallesi, Tarlabaşı Bulvarı, No:150-170 D:33
+Beyoğlu, İstanbul, Türkiye
+
+— This is an automated confirmation. Please do not reply to this message; a consultant will follow up from info@globalmakademi.com shortly.">
                 <!-- Honeypot: real users leave this empty; bots fill it and FormSubmit drops the message. -->
                 <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
 
