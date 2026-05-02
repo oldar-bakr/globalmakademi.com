@@ -1,43 +1,42 @@
 <?php
 /**
- * Makademi site config — TEMPLATE.
+ * Makademi site config — LOCAL DEV (Replit).
  *
- * On Hostinger:
- *   1. Copy this file to: includes/config.php
- *   2. Fill in the MySQL credentials from hPanel → Databases → MySQL.
- *   3. Set a long, random APP_SECRET (used for session security).
- *   4. Save. Do NOT commit includes/config.php anywhere public.
+ * This file is gitignored and is the LOCAL DEVELOPMENT copy only.
+ * It points at the SQLite file under db/makademi.sqlite so the
+ * Replit preview works without a MySQL server.
  *
- * For local development on Replit, includes/config.php already
- * exists and points at a SQLite file under db/ — leave that alone.
+ * The PRODUCTION config.php lives only on Hostinger under
+ * public_html/includes/config.php and is never committed.
+ *
+ * If you need the production template, see config.example.php in
+ * the website root.
  */
 
 return [
-    // 'mysql' for Hostinger production, 'sqlite' for local dev.
-    'db_driver' => 'mysql',
+    // 'sqlite' for local dev on Replit, 'mysql' for Hostinger.
+    'db_driver' => 'sqlite',
 
-    // MySQL settings (used when db_driver = 'mysql').
+    // MySQL settings (unused while db_driver = 'sqlite').
     'db_host'     => 'localhost',
     'db_name'     => 'u123456789_makademi',
     'db_user'     => 'u123456789_admin',
-    'db_pass'     => 'Makademiu391586678_pass',
+    'db_pass'     => 'placeholder-not-used-locally',
     'db_port'     => 3306,
     'db_charset'  => 'utf8mb4',
 
-    // SQLite settings (used when db_driver = 'sqlite' — local dev only).
+    // SQLite path (used while db_driver = 'sqlite').
     'sqlite_path' => __DIR__ . '/../db/makademi.sqlite',
 
-    // 32+ characters of random bytes. Generate with `openssl rand -hex 32`.
-    'app_secret'  => '7ec92a0f7d723b7472be652c71f2ac5f23b08e4b0707e6b9d361d8aec3dd159e',
+    // Local dev secret — never used in production.
+    'app_secret'  => 'replit-local-dev-secret-d4e7c0a3-not-for-public-deploy',
 
-    // Where uploaded gallery images are stored on disk (relative to site root).
+    // Where uploaded gallery images live on disk (relative to site root).
     'gallery_upload_dir' => __DIR__ . '/../assets/images/gallery',
 
     // Public URL prefix for those images (relative to site root).
     'gallery_url_prefix' => 'assets/images/gallery',
 
-    // Set to true once /admin/setup-account.php has created the admin
-    // user. The setup page refuses to run again when this is true.
-    // (You can also delete the setup file from the server entirely.)
-    'setup_complete' => false,
+    // Local admin user already created during initial setup.
+    'setup_complete' => true,
 ];
