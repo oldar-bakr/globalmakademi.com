@@ -97,8 +97,11 @@ That's not the pull — `admin_users` is a database row, not a file. Most likely
 
 **"I broke something and want to start over."**
 You can always fall back to the original zip-upload workflow:
-1. In hPanel → Git, click **Disconnect**.
-2. Open File Manager, delete everything in `public_html/`.
-3. Upload `makademi-website.zip` and extract it. Done — no Git involved.
 
-The DB and `assets/images/gallery/` uploads survive any of this.
+1. **First, back up your gallery uploads.** Open File Manager, navigate to `public_html/assets/images/gallery/`, and download any photo whose filename is **not** `firefighter-1.jpeg` through `firefighter-6.jpeg`. Those user-uploaded files only exist on the server; deleting `public_html/` deletes them permanently. The 6 `firefighter-*.jpeg` seed photos ship in the zip and don't need backup.
+2. In hPanel → Git, click **Disconnect**.
+3. Open File Manager, delete everything in `public_html/`.
+4. Upload `makademi-website.zip` and extract it.
+5. Re-upload your backed-up gallery files into `public_html/assets/images/gallery/`.
+
+The MySQL database is stored separately by Hostinger and survives any of this. **Files under `public_html/` (including gallery uploads) do not** — back them up first.

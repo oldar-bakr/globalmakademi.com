@@ -32,6 +32,7 @@ set -euo pipefail
 PREFIX="makademi-website"
 BRANCH="hostinger-deploy"
 REMOTE="origin"
+SOURCE_BRANCH="main"
 EXCLUDE=(
   "includes/config.php"
   "admin/.installed"
@@ -49,9 +50,21 @@ if [[ ! -d "$PREFIX" ]]; then
   exit 1
 fi
 
+current_branch="$(git rev-parse --abbrev-ref HEAD)"
+if [[ "$current_branch" != "$SOURCE_BRANCH" ]]; then
+  echo "ERROR: You are on branch '$current_branch'. Switch to '$SOURCE_BRANCH' first." >&2
+  echo "       (The deploy branch is always generated from $SOURCE_BRANCH so" >&2
+  echo "       what's pushed matches what's documented.)" >&2
+  echo "       To override (rare), set ALLOW_NON_MAIN=1 in the environment." >&2
+  if [[ "${ALLOW_NON_MAIN:-0}" != "1" ]]; then
+    exit 1
+  fi
+  echo "       ALLOW_NON_MAIN=1 set; continuing with $current_branch." >&2
+fi
+
 if ! git diff --quiet -- "$PREFIX" || ! git diff --cached --quiet -- "$PREFIX"; then
   echo "ERROR: You have uncommitted changes in $PREFIX/." >&2
-  echo "       Commit or stash them first so the deploy branch matches main." >&2
+  echo "       Commit or stash them first so the deploy branch matches $SOURCE_BRANCH." >&2
   exit 1
 fi
 
