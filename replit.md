@@ -94,6 +94,18 @@ Re-syncing after a code change to `makademi-website/`:
 ./scripts/sync-hostinger-deploy.sh
 ```
 
-The script runs `git subtree split --prefix=makademi-website -b hostinger-deploy` and pushes with `--force-with-lease`. It refuses to run with uncommitted changes inside `makademi-website/`. End-user instructions are in `HOSTINGER_GIT.md` at the repo root. The zip-upload path (`makademi-website.zip` + File Manager) remains supported as a fallback.
+The script runs three steps: (1) `git subtree split --prefix=makademi-website -b hostinger-deploy`, (2) in a throwaway worktree it `git rm`'s the dev-only files (`includes/config.php`, `admin/.installed`, `db/makademi.sqlite`, `db/makademi.sqlite-journal`, `data/extracted.json`) and commits the removal, (3) `git push --force-with-lease origin hostinger-deploy`. It refuses to run with uncommitted changes inside `makademi-website/`. End-user instructions are in `HOSTINGER_GIT.md` at the repo root. The zip-upload path (`makademi-website.zip` + File Manager) remains supported as a fallback.
+
+> **Critical**: `makademi-website/includes/config.php` is currently tracked on `main` (it's the dev SQLite config that lets the site run out-of-the-box in Replit). The sync script's scrub step is what keeps that file out of the deploy branch — without it, every `git pull` on Hostinger would overwrite the production credentials with the dev ones. If you ever modify the script, the `EXCLUDE` list at the top is load-bearing.
 
 > **First push gotcha**: the main agent's git wrapper blocks `git subtree split` and `git push`. The first execution of the sync script needs to be run from a developer's local clone (or by reassigning a Hostinger-deploy task to a Replit task agent in an isolated environment). Subsequent runs are no different.
+
+Verification of the deploy branch contents (without actually pushing) — useful in CI or after editing the EXCLUDE list:
+
+```bash
+SIM=$(mktemp -d) && cp -r makademi-website/. "$SIM/" \
+  && rm -f "$SIM"/{includes/config.php,admin/.installed,db/makademi.sqlite,db/makademi.sqlite-journal,data/extracted.json} \
+  && (cd "$SIM" && ls -A | sort) && rm -rf "$SIM"
+```
+
+When run today, the result is exactly: `404.html about.html admin ADMIN_SETUP.md apple-touch-icon.png assets config.example.php CONTACT_FORM_SETUP.md contact.html courses courses.php data db favicon-16.png favicon-32.png favicon.ico gallery.php includes index.html README.txt`. Note the absence of `package.json`, `artifacts/`, `pnpm-workspace.yaml`, `replit.md`, `scripts/`, `.local/`.

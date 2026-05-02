@@ -54,30 +54,33 @@ That's it.
 
 ## What does the sync script actually do?
 
-```bash
-git subtree split --prefix=makademi-website -b hostinger-deploy
-git push --force-with-lease origin hostinger-deploy
-```
+In plain English, three steps:
 
-In plain English:
-
-- **`git subtree split`** takes the `makademi-website/` folder and re-creates it as a parallel branch where the folder's content sits at the root. It only touches the new branch — it never modifies `main`.
-- **`git push --force-with-lease`** publishes the freshly-rebuilt branch to GitHub. The `--force-with-lease` flag is safe here because the deploy branch is a generated artifact of `main`; nothing else should be pushing to it.
+1. **Split** — `git subtree split --prefix=makademi-website -b hostinger-deploy` takes the `makademi-website/` folder and re-creates it as a parallel branch where the folder's content sits at the root. It only touches the new branch; `main` is never modified.
+2. **Scrub** — In a throwaway temporary worktree, the script removes the dev-only files listed above (most importantly `includes/config.php`) and commits the removal. Production never sees them.
+3. **Push** — `git push --force-with-lease origin hostinger-deploy` publishes the scrubbed branch to GitHub. The `--force-with-lease` flag is safe here because the deploy branch is a regenerated artifact of `main` — nothing else should be pushing to it.
 
 The script also:
 
 - Refuses to run if you have uncommitted changes inside `makademi-website/`, so you don't accidentally deploy something that isn't on `main`.
+- Cleans up its temporary worktree even if something errors mid-run.
 - Reminds you to trigger the pull on Hostinger when it finishes.
 
 ---
 
 ## Files that are intentionally NOT pushed
 
-These three files exist on the Hostinger server but are NOT in the repo, so a pull will never overwrite them:
+A `git pull` on Hostinger will never overwrite the following files, because the sync script strips them from the `hostinger-deploy` branch before pushing:
 
-- **`includes/config.php`** — your DB credentials and `app_secret`. The repo only ships `config.example.php`. Keep your real `config.php` safe; if you ever lose it, copy `config.example.php` again and fill it in.
+- **`includes/config.php`** — your real DB credentials and `app_secret`. (A *dev* copy of `config.php` does live on the `main` branch so the site runs in Replit out-of-the-box, but the sync script removes it from the deploy branch. Production sees only `config.example.php`, which you copy and fill in once during the initial Hostinger setup.)
 - **`admin/.installed`** — the marker that says "admin account already created". Created automatically when you run setup the first time.
+- **`db/makademi.sqlite`** and **`data/extracted.json`** — local-dev artifacts. Not relevant to your MySQL production DB.
+
+Files that exist only on the server and are also untouched by a pull:
+
 - **`assets/images/gallery/<your-uploads>.jpg`** — anything an admin uploads via `/admin/gallery.php` lives only on the server. The 6 seed photos that ship in the repo (`firefighter-1.jpeg` … `firefighter-6.jpeg`) WILL be re-pulled if they're missing.
+
+> **Why this matters**: if `includes/config.php` were published to the deploy branch, every `git pull` on Hostinger would overwrite your real production DB credentials with a copy of the dev secrets. The sync script's scrubbing step exists specifically to prevent that. If you ever modify the script, do not remove the `EXCLUDE` list at the top.
 
 ---
 
