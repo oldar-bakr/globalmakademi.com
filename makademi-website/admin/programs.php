@@ -1,9 +1,16 @@
 <?php
 declare(strict_types=1);
 
+// Boot the admin context BEFORE any output so POST handlers can redirect
+// (and AJAX handlers can send JSON headers) without "headers already sent".
+require_once __DIR__ . '/../includes/db.php';
+require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/csrf.php';
+require_once __DIR__ . '/../includes/helpers.php';
+require_admin();
+
 $active_admin_nav = 'programs';
 $admin_page_title = 'Programs — Makademi Admin';
-require __DIR__ . '/_header.php';
 
 $pdo = db();
 $action = $_GET['action'] ?? 'list';
@@ -117,13 +124,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $categories = categories_all();
 
+// Resolve the editing record BEFORE any output so a missing-id redirect works.
+$editing = null;
+if ($action === 'edit') {
+    $editing = load_program($pdo, (int)($_GET['id'] ?? 0));
+    if (!$editing) { flash_set('error', 'Program not found.'); redirect('programs.php'); }
+}
+
+// Safe to render now.
+require __DIR__ . '/_header.php';
+
 // ---------- New / Edit form ----------
 if ($action === 'new' || $action === 'edit') {
-    $editing = null;
-    if ($action === 'edit') {
-        $editing = load_program($pdo, (int)($_GET['id'] ?? 0));
-        if (!$editing) { flash_set('error', 'Program not found.'); redirect('programs.php'); }
-    }
     $f = $editing ?? ['id'=>0,'title'=>'','description'=>'','category_id'=>($categories[0]['id']??0),'duration'=>'','location'=>'','detail_url'=>'','sort_order'=>0,'is_published'=>1];
     ?>
     <h1><?= $editing ? 'Edit program' : 'Add new program' ?></h1>

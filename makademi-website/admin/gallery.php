@@ -1,9 +1,16 @@
 <?php
 declare(strict_types=1);
 
+// Boot the admin context BEFORE any output so POST handlers can redirect
+// (and AJAX handlers can send JSON headers) without "headers already sent".
+require_once __DIR__ . '/../includes/db.php';
+require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/csrf.php';
+require_once __DIR__ . '/../includes/helpers.php';
+require_admin();
+
 $active_admin_nav = 'gallery';
 $admin_page_title = 'Gallery — Makademi Admin';
-require __DIR__ . '/_header.php';
 
 $pdo  = db();
 $cfg  = app_config();
@@ -204,6 +211,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $cats = gallery_categories_all();
 $badgeChoices = ['engineering','maintenance','finance','telecom','fire','hse','corrosion','management','high-value'];
 
+// Safe to render now — all POST branches above either exit or redirect.
+require __DIR__ . '/_header.php';
 ?>
 <h1>Gallery</h1>
 <p>Manage the photos that appear on the public Gallery page. Photos are saved to <code>assets/images/gallery/</code>.</p>
