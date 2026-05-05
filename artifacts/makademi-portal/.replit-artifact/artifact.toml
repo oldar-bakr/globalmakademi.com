@@ -15,17 +15,11 @@ paths = [ "/" ]
 localPort = 22731
 
 [services.development]
-run = "pnpm --filter @workspace/makademi-portal run dev"
+run = "php -S 0.0.0.0:22731 -t /home/runner/workspace/makademi-website"
 
 [services.production]
-build = [ "pnpm", "--filter", "@workspace/makademi-portal", "run", "build" ]
-publicDir = "artifacts/makademi-portal/dist/public"
+publicDir = "makademi-website"
 serve = "static"
-
-[[services.production.rewrites]]
-from = "/*"
-to = "/index.html"
 
 [services.env]
 PORT = "22731"
-BASE_PATH = "/"

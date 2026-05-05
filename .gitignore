@@ -47,3 +47,8 @@ Thumbs.db
 # Replit
 .cache/
 .local/
+
+# Makademi PHP — local dev DB and prod-only secrets
+makademi-website/db/makademi.sqlite
+makademi-website/db/makademi.sqlite-journal
+makademi-website/data/extracted.json

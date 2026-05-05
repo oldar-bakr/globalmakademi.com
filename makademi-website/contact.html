@@ -5,7 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Contact - Global Makademi</title>
   <meta name="description" content="Contact our training consultants to request a customized program, inquire about schedules, or discuss corporate partnerships.">
-  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="favicon.ico" sizes="48x48">
+  <link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="icon" href="favicon-16.png" type="image/png" sizes="16x16">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
@@ -18,14 +21,15 @@
           <img src="assets/images/makademi-logo.jpeg" alt="Global Makademi Logo">
           <div class="brand-text">
             <span class="brand-name">GLOBAL MAKADEMI</span>
-            <span class="brand-sub">MAKADEMI TRAINING AND CONSULTANCY ltd</span>
+            <span class="brand-sub">MAKADEMI TRAINING &amp; CONSULTANCY LTD</span>
           </div>
         </a>
         <nav class="desktop-nav">
           <div class="nav-links">
             <a href="index.html" class="nav-link">Home</a>
             <a href="about.html" class="nav-link">About</a>
-            <a href="courses.html" class="nav-link">Programs</a>
+            <a href="courses.php" class="nav-link">Programs</a>
+            <a href="gallery.php" class="nav-link">Gallery</a>
             <a href="contact.html" class="nav-link active">Contact</a>
           </div>
           <a href="contact.html" class="btn btn-gold">Inquire Now</a>
@@ -39,7 +43,8 @@
     <div class="mobile-nav" id="mobile-nav">
       <a href="index.html" class="nav-link">Home</a>
       <a href="about.html" class="nav-link">About</a>
-      <a href="courses.html" class="nav-link">Programs</a>
+      <a href="courses.php" class="nav-link">Programs</a>
+      <a href="gallery.php" class="nav-link">Gallery</a>
       <a href="contact.html" class="nav-link active">Contact</a>
       <div class="mobile-cta">
         <a href="contact.html" class="btn btn-gold btn-full" style="font-size:1.125rem;height:3rem">Inquire Now</a>
@@ -94,12 +99,12 @@
                   <div style="display:flex;flex-direction:column;gap:0.25rem;margin-top:0.125rem">
                     <div>
                       <span style="font-size:0.75rem;font-weight:600;color:var(--slate-500);text-transform:uppercase;letter-spacing:0.04em">Office (Tel)</span>
-                      <a href="tel:+902123373744" class="val" style="display:block">+90 212 337 37 44</a>
+                      <a href="tel:+902123373774" class="val" style="display:block">+90 212 337 37 74</a>
                       <div style="font-size:0.75rem;color:var(--slate-500)">Company landline</div>
                     </div>
                     <div style="margin-top:0.5rem">
-                      <span style="font-size:0.75rem;font-weight:600;color:var(--slate-500);text-transform:uppercase;letter-spacing:0.04em">Mobile</span>
-                      <a href="tel:+905319595944" class="val" style="display:block">+90 531 959 59 44</a>
+                      <span style="font-size:0.75rem;font-weight:600;color:var(--slate-500);text-transform:uppercase;letter-spacing:0.04em">Fax</span>
+                      <a href="tel:+902123378860" class="val" style="display:block">+90 212 337 88 60</a>
                     </div>
                   </div>
                 </div>
@@ -135,24 +140,61 @@
               <h2 style="font-size:1.5rem;font-weight:700;color:var(--navy);margin-bottom:2rem">Send us a Message</h2>
 
               <!--
-                HOSTINGER / FormSubmit OPTION:
-                Replace the form action with your preferred handler:
-                  action="https://formsubmit.co/YOUR_EMAIL" method="POST"
-                Or use Hostinger's built-in form handler.
-                The current setup uses a mailto fallback + JS success panel.
+                Email delivery is handled by FormSubmit (https://formsubmit.co).
+                See CONTACT_FORM_SETUP.md for the one-time activation step
+                (FormSubmit sends a verification email the first time the form
+                is submitted from the live domain — click the link inside it
+                to start receiving inquiries).
               -->
-              <form id="contact-form" action="https://formsubmit.co/info@globalmakademi.com" method="POST">
+              <form id="contact-form" action="https://formsubmit.co/4a25594be38072bdab39513b617f5846" method="POST">
+                <!-- FormSubmit meta fields -->
+                <input type="hidden" name="_subject" value="New inquiry from globalmakademi.com">
+                <input type="hidden" name="_template" value="table">
                 <input type="hidden" name="_captcha" value="false">
-                <input type="hidden" name="_next" value="">
+                <input type="hidden" name="_next" value="https://globalmakademi.com/contact.html#thanks">
+                <!--
+                  Reply-To: the JS submit handler in assets/js/main.js mirrors
+                  the email input into this hidden field on submit, so the
+                  delivered email's Reply-To always points at the visitor.
+                  In the rare no-JS fallback path, FormSubmit also auto-detects
+                  the lowercase `email` field below.
+                -->
+                <input type="hidden" name="_replyto" id="replyto-mirror" value="">
+                <!--
+                  Auto-response: FormSubmit emails the visitor a copy of this
+                  message right after they submit the form, using the address
+                  they typed into the email field. To edit the wording, just
+                  change the `value` below — see CONTACT_FORM_SETUP.md
+                  ("Auto-confirmation email") for guidance.
+                -->
+                <input type="hidden" name="_autoresponse" value="Hello,
+
+Thank you for contacting Global Makademi. We have received your inquiry and one of our training consultants will reply personally within 24 hours (Monday to Friday, Istanbul time).
+
+If your request is urgent, you can reach us directly:
+  Phone: +90 212 337 37 74
+  Email: info@globalmakademi.com
+
+While you wait, you are welcome to browse our full programme catalogue at https://globalmakademi.com/courses.php or learn more about us at https://globalmakademi.com/about.html.
+
+Warm regards,
+The Global Makademi Team
+Makademi Training &amp; Consultancy Ltd
+Çukur Mahallesi, Tarlabaşı Bulvarı, No:150-170 D:33
+Beyoğlu, İstanbul, Türkiye
+
+— This is an automated confirmation. Please do not reply to this message; a consultant will follow up from info@globalmakademi.com shortly.">
+                <!-- Honeypot: real users leave this empty; bots fill it and FormSubmit drops the message. -->
+                <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
 
                 <div class="form-grid" style="margin-bottom:1.5rem">
                   <div class="form-group">
                     <label for="name" class="label">Full Name *</label>
-                    <input type="text" id="name" name="name" required class="input">
+                    <input type="text" id="name" name="Full Name" required class="input">
                   </div>
                   <div class="form-group">
                     <label for="company" class="label">Company / Organization *</label>
-                    <input type="text" id="company" name="company" required class="input">
+                    <input type="text" id="company" name="Company" required class="input">
                   </div>
                 </div>
 
@@ -163,31 +205,31 @@
                   </div>
                   <div class="form-group">
                     <label for="phone" class="label">Phone Number</label>
-                    <input type="tel" id="phone" name="phone" class="input">
+                    <input type="tel" id="phone" name="Phone" class="input">
                   </div>
                 </div>
 
                 <div class="form-grid" style="margin-bottom:1.5rem">
                   <div class="form-group">
                     <label for="industry" class="label">Industry</label>
-                    <select id="industry" name="industry" class="input select-native">
-                      <option value="oil-gas" selected>Oil &amp; Gas</option>
-                      <option value="energy">Energy</option>
-                      <option value="automotive">Automotive</option>
-                      <option value="hse">HSE / Safety</option>
-                      <option value="government">Government</option>
-                      <option value="other">Other</option>
+                    <select id="industry" name="Industry" class="input select-native">
+                      <option value="Oil & Gas" selected>Oil &amp; Gas</option>
+                      <option value="Energy">Energy</option>
+                      <option value="Automotive">Automotive</option>
+                      <option value="HSE / Safety">HSE / Safety</option>
+                      <option value="Government">Government</option>
+                      <option value="Other">Other</option>
                     </select>
                   </div>
                   <div class="form-group">
                     <label for="subject" class="label">Subject</label>
-                    <input type="text" id="subject" name="subject" class="input">
+                    <input type="text" id="subject" name="Subject" class="input">
                   </div>
                 </div>
 
                 <div class="form-group" style="margin-bottom:1.5rem">
                   <label for="message" class="label">Message *</label>
-                  <textarea id="message" name="message" required rows="6" placeholder="Please provide details about your training requirements..." class="textarea"></textarea>
+                  <textarea id="message" name="Message" required rows="6" placeholder="Please provide details about your training requirements..." class="textarea"></textarea>
                 </div>
 
                 <button type="submit" class="btn btn-gold btn-full btn-lg">Submit Inquiry</button>
@@ -195,6 +237,7 @@
             </div>
 
             <div id="success-panel" class="success-panel" style="display:none">
+              <a id="thanks" aria-hidden="true" tabindex="-1" style="position:absolute"></a>
               <div class="check-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
               </div>
@@ -218,10 +261,10 @@
             <img src="assets/images/makademi-logo.jpeg" alt="Global Makademi Logo">
             <div class="brand-text">
               <span class="brand-name" style="font-size:1.125rem">GLOBAL MAKADEMI</span>
-              <span class="brand-sub" style="color:var(--gold);font-size:0.6875rem">MAKADEMI TRAINING AND CONSULTANCY ltd</span>
+              <span class="brand-sub" style="color:var(--gold);font-size:0.6875rem">MAKADEMI TRAINING &amp; CONSULTANCY LTD</span>
             </div>
           </div>
-          <p style="color:var(--slate-300);font-size:0.875rem;line-height:1.75;max-width:18rem">Excellence in Industrial Makademi Training and Consultancy ltd serving the Mediterranean region and beyond.</p>
+          <p style="color:var(--slate-300);font-size:0.875rem;line-height:1.75;max-width:18rem">Excellence in Industrial Makademi Training &amp; Consultancy Ltd serving the Mediterranean region and beyond.</p>
           <a href="mailto:info@globalmakademi.com" style="color:var(--gold);font-weight:500">info@globalmakademi.com</a>
         </div>
         <div class="footer-col">
@@ -229,19 +272,20 @@
           <ul>
             <li><a href="index.html">Home</a></li>
             <li><a href="about.html">About</a></li>
-            <li><a href="courses.html">Programs</a></li>
+            <li><a href="courses.php">Programs</a></li>
+            <li><a href="gallery.php">Gallery</a></li>
             <li><a href="contact.html">Contact</a></li>
           </ul>
         </div>
         <div class="footer-col">
           <h4>Program Categories</h4>
           <ul>
-            <li><a href="courses.html?category=engineering-technical">Engineering &amp; Technical</a></li>
-            <li><a href="courses.html?category=health-safety-environment">Health, Safety &amp; Environment</a></li>
-            <li><a href="courses.html?category=fire-safety-emergency">Fire Safety &amp; Emergency</a></li>
-            <li><a href="courses.html?category=telecom-digital">Telecom &amp; Digital</a></li>
-            <li><a href="courses.html?category=management-leadership">Management &amp; Leadership</a></li>
-            <li><a href="courses.html?category=maintenance-production">Maintenance &amp; Production</a></li>
+            <li><a href="courses.php?category=engineering-technical">Engineering &amp; Technical</a></li>
+            <li><a href="courses.php?category=health-safety-environment">Health, Safety &amp; Environment</a></li>
+            <li><a href="courses.php?category=fire-safety-emergency">Fire Safety &amp; Emergency</a></li>
+            <li><a href="courses.php?category=telecom-digital">Telecom &amp; Digital</a></li>
+            <li><a href="courses.php?category=management-leadership">Management &amp; Leadership</a></li>
+            <li><a href="courses.php?category=maintenance-production">Maintenance &amp; Production</a></li>
           </ul>
         </div>
         <div class="footer-col">
@@ -256,12 +300,13 @@
         </div>
       </div>
       <div class="footer-bottom">
-        <p>&copy; <span class="current-year">2026</span> Makademi Training and Consultancy ltd. All rights reserved.</p>
+        <p>&copy; <span class="current-year">2026</span> Makademi Training &amp; Consultancy Ltd. All rights reserved.</p>
         <a href="mailto:info@globalmakademi.com" style="color:var(--slate-400)">info@globalmakademi.com</a>
       </div>
     </div>
   </footer>
 
+  <script src="assets/js/i18n.js"></script>
   <script src="assets/js/main.js"></script>
 </body>
 </html>

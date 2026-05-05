@@ -135,12 +135,31 @@ document.addEventListener('DOMContentLoaded', function () {
   var formPanel = document.getElementById('form-panel');
   var successPanel = document.getElementById('success-panel');
 
+  function showContactSuccess() {
+    if (formPanel) formPanel.style.display = 'none';
+    if (successPanel) {
+      successPanel.style.display = 'flex';
+      if (successPanel.scrollIntoView) {
+        successPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  }
+
   if (contactForm) {
     contactForm.addEventListener('submit', function (e) {
       e.preventDefault();
+      // Mirror the visitor's email into the hidden _replyto field so
+      // FormSubmit sets Reply-To deterministically (independent of its
+      // automatic field-name detection).
+      var emailInput = document.getElementById('email');
+      var replytoMirror = document.getElementById('replyto-mirror');
+      if (emailInput && replytoMirror) {
+        replytoMirror.value = emailInput.value;
+      }
       var data = new FormData(contactForm);
       var action = contactForm.getAttribute('action');
       var submitBtn = contactForm.querySelector('button[type="submit"]');
+      var originalLabel = submitBtn ? submitBtn.textContent : '';
       if (submitBtn) {
         submitBtn.disabled = true;
         submitBtn.textContent = 'Sending...';
@@ -151,8 +170,7 @@ document.addEventListener('DOMContentLoaded', function () {
         headers: { 'Accept': 'application/json' }
       }).then(function (res) {
         if (res.ok) {
-          if (formPanel) formPanel.style.display = 'none';
-          if (successPanel) successPanel.style.display = 'flex';
+          showContactSuccess();
         } else {
           alert('Something went wrong. Please try again or email us directly at info@globalmakademi.com');
         }
@@ -161,9 +179,22 @@ document.addEventListener('DOMContentLoaded', function () {
       }).finally(function () {
         if (submitBtn) {
           submitBtn.disabled = false;
-          submitBtn.textContent = 'Send Message';
+          submitBtn.textContent = originalLabel || 'Submit Inquiry';
         }
       });
+    });
+
+    // No-JS fallback: FormSubmit redirects to contact.html#thanks. When the
+    // page loads with that hash (or the hash changes to it later), swap
+    // straight to the success panel so the visitor never lands on a
+    // blank-looking form.
+    if (window.location.hash === '#thanks') {
+      showContactSuccess();
+    }
+    window.addEventListener('hashchange', function () {
+      if (window.location.hash === '#thanks') {
+        showContactSuccess();
+      }
     });
   }
 
@@ -173,6 +204,9 @@ document.addEventListener('DOMContentLoaded', function () {
       if (formPanel) formPanel.style.display = 'block';
       if (successPanel) successPanel.style.display = 'none';
       if (contactForm) contactForm.reset();
+      if (window.location.hash === '#thanks' && window.history && window.history.replaceState) {
+        window.history.replaceState(null, '', window.location.pathname + window.location.search);
+      }
     });
   }
 
@@ -204,5 +238,79 @@ document.addEventListener('DOMContentLoaded', function () {
   var subjectInput = document.getElementById('subject');
   if (subjectParam && subjectInput) {
     subjectInput.value = subjectParam;
+  }
+
+  // ===== LIGHTBOX (gallery) =====
+  var lightbox = document.getElementById('lightbox');
+  var lightboxImage = document.getElementById('lightbox-image');
+  var lightboxCaption = document.getElementById('lightbox-caption');
+  var photoTiles = document.querySelectorAll('.photo-tile');
+
+  if (lightbox && lightboxImage && photoTiles.length) {
+    var tilesArray = Array.prototype.slice.call(photoTiles);
+    var currentIndex = -1;
+    var lastFocused = null;
+
+    function showAt(idx) {
+      if (idx < 0) idx = tilesArray.length - 1;
+      if (idx >= tilesArray.length) idx = 0;
+      currentIndex = idx;
+      var tile = tilesArray[idx];
+      lightboxImage.src = tile.getAttribute('data-lightbox-src') || '';
+      lightboxImage.alt = tile.getAttribute('data-lightbox-caption') || '';
+      if (lightboxCaption) {
+        lightboxCaption.textContent = tile.getAttribute('data-lightbox-caption') || '';
+      }
+    }
+
+    function openLightbox(idx) {
+      lastFocused = document.activeElement;
+      showAt(idx);
+      lightbox.hidden = false;
+      document.body.style.overflow = 'hidden';
+      var closeBtn = lightbox.querySelector('[data-lightbox-close]');
+      if (closeBtn) closeBtn.focus();
+    }
+
+    function closeLightbox() {
+      lightbox.hidden = true;
+      lightboxImage.src = '';
+      document.body.style.overflow = '';
+      if (lastFocused && typeof lastFocused.focus === 'function') {
+        lastFocused.focus();
+      }
+      currentIndex = -1;
+    }
+
+    tilesArray.forEach(function (tile, i) {
+      tile.addEventListener('click', function () { openLightbox(i); });
+    });
+
+    var closeBtn = lightbox.querySelector('[data-lightbox-close]');
+    var prevBtn = lightbox.querySelector('[data-lightbox-prev]');
+    var nextBtn = lightbox.querySelector('[data-lightbox-next]');
+    if (closeBtn) closeBtn.addEventListener('click', closeLightbox);
+    if (prevBtn) prevBtn.addEventListener('click', function () { showAt(currentIndex - 1); });
+    if (nextBtn) nextBtn.addEventListener('click', function () { showAt(currentIndex + 1); });
+
+    lightbox.addEventListener('click', function (e) {
+      if (e.target === lightbox) closeLightbox();
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (lightbox.hidden) return;
+      if (e.key === 'Escape') { e.preventDefault(); closeLightbox(); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); showAt(currentIndex - 1); }
+      else if (e.key === 'ArrowRight') { e.preventDefault(); showAt(currentIndex + 1); }
+      else if (e.key === 'Tab') {
+        // Simple focus trap among the lightbox controls
+        var focusables = [closeBtn, prevBtn, nextBtn].filter(Boolean);
+        if (!focusables.length) return;
+        var idx = focusables.indexOf(document.activeElement);
+        e.preventDefault();
+        var nextIdx = e.shiftKey ? (idx <= 0 ? focusables.length - 1 : idx - 1) : ((idx + 1) % focusables.length);
+        focusables[nextIdx].focus();
+      }
+    });
   }
 });
