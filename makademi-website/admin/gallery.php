@@ -147,6 +147,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         redirect('gallery.php');
     }
 
+    if ($do === 'reorder') {
+        $kind = (string)($_POST['scope_id'] ?? '');
+        $ids  = $_POST['order'] ?? [];
+        if (!is_array($ids)) $ids = [];
+        $clean = [];
+        foreach ($ids as $id) {
+            $n = (int)$id;
+            if ($n > 0) $clean[] = $n;
+        }
+        $wantsJson = (($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') !== '')
+            || str_contains((string)($_SERVER['HTTP_ACCEPT'] ?? ''), 'application/json');
+
+        $ok = true;
+        if ($clean) {
+            try {
+                if (str_starts_with($kind, 'cat:')) {
+                    $catId = (int)substr($kind, 4);
+                    // Only update images that actually belong to this category — guards against tampering.
+                    $pdo->beginTransaction();
+                    $u = $pdo->prepare('UPDATE gallery_images SET sort_order = ? WHERE id = ? AND gallery_category_id = ?');
+                    foreach ($clean as $i => $imgId) {
+                        $u->execute([$i, $imgId, $catId]);
+                    }
+                    $pdo->commit();
+                } else {
+                    $ok = false;
+                }
+            } catch (Throwable $e) {
+                if ($pdo->inTransaction()) $pdo->rollBack();
+                $ok = false;
+            }
+        }
+
+        if ($wantsJson) {
+            header('Content-Type: application/json');
+            if (!$ok) http_response_code(400);
+            echo json_encode(['ok' => $ok, 'count' => count($clean)]);
+            exit;
+        }
+        flash_set($ok ? 'success' : 'error', $ok ? 'Order updated.' : 'Could not save the new order.');
+        redirect('gallery.php');
+    }
+
     if ($do === 'update_caption') {
         $id      = (int)($_POST['id'] ?? 0);
         $caption = trim((string)($_POST['caption'] ?? ''));
@@ -234,9 +277,12 @@ $badgeChoices = ['engineering','maintenance','finance','telecom','fire','hse','c
 <?php if (!$images): ?>
   <p style="color:var(--admin-muted)">No photos yet — upload one below.</p>
 <?php else: ?>
-  <div class="gallery-grid">
+  <div class="gallery-grid reorder-horizontal" data-reorder data-reorder-url="gallery.php" data-reorder-item=".gallery-thumb[data-id]" data-reorder-scope="cat:<?= (int)$cat['id'] ?>">
 <?php foreach ($images as $img): $src = '../' . $urlPrefix . '/' . rawurlencode($img['filename']); ?>
-    <div class="gallery-thumb">
+    <div class="gallery-thumb" data-id="<?= (int)$img['id'] ?>">
+      <span class="drag-handle gallery-handle" role="button" aria-label="Drag to reorder" title="Drag to reorder">
+        <svg viewBox="0 0 24 24" aria-hidden="true" width="16" height="16"><path fill="currentColor" d="M9 5h2v2H9V5Zm4 0h2v2h-2V5ZM9 11h2v2H9v-2Zm4 0h2v2h-2v-2ZM9 17h2v2H9v-2Zm4 0h2v2h-2v-2Z"/></svg>
+      </span>
       <img src="<?= e($src) ?>" alt="<?= e($img['caption']) ?>" loading="lazy">
       <div class="meta">
         <div class="cap"><?= e($img['caption'] !== '' ? $img['caption'] : '(no caption)') ?></div>
@@ -251,7 +297,7 @@ $badgeChoices = ['engineering','maintenance','finance','telecom','fire','hse','c
           </form>
         </details>
         <div class="row-actions">
-          <span style="font-size:0.7rem;color:var(--admin-subtle);text-transform:uppercase;letter-spacing:0.05em">#<?= (int)$img['sort_order'] + 1 ?></span>
+          <span data-sort-label style="font-size:0.7rem;color:var(--admin-subtle);text-transform:uppercase;letter-spacing:0.05em">#<?= (int)$img['sort_order'] + 1 ?></span>
           <form method="post" onsubmit="return confirm('Delete this photo?')">
             <?= csrf_field() ?>
             <input type="hidden" name="do" value="delete_photo">

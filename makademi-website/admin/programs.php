@@ -66,6 +66,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         redirect('programs.php');
     }
 
+    if ($do === 'reorder') {
+        $ids = $_POST['order'] ?? [];
+        if (!is_array($ids)) $ids = [];
+        $clean = [];
+        foreach ($ids as $id) {
+            $n = (int)$id;
+            if ($n > 0) $clean[] = $n;
+        }
+        $wantsJson = (($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') !== '')
+            || str_contains((string)($_SERVER['HTTP_ACCEPT'] ?? ''), 'application/json');
+        if ($clean) {
+            try {
+                $pdo->beginTransaction();
+                $u = $pdo->prepare('UPDATE programs SET sort_order = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?');
+                foreach ($clean as $i => $pid) {
+                    $u->execute([$i + 1, $pid]);
+                }
+                $pdo->commit();
+            } catch (Throwable $e) {
+                if ($pdo->inTransaction()) $pdo->rollBack();
+                if ($wantsJson) {
+                    http_response_code(500);
+                    header('Content-Type: application/json');
+                    echo json_encode(['ok' => false, 'error' => 'save_failed']);
+                    exit;
+                }
+                flash_set('error', 'Could not save the new order.');
+                redirect('programs.php');
+            }
+        }
+        if ($wantsJson) {
+            header('Content-Type: application/json');
+            echo json_encode(['ok' => true, 'count' => count($clean)]);
+            exit;
+        }
+        flash_set('success', 'Order updated.');
+        redirect('programs.php');
+    }
+
     if ($do === 'delete') {
         $id = (int)($_POST['id'] ?? 0);
         if ($id > 0) {
@@ -192,10 +231,19 @@ $rows = $stmt->fetchAll();
   </div>
 </form>
 
+<?php
+$canReorder = ($search === '' && $catSlug === '');
+?>
+<?php if (!$canReorder && $rows): ?>
+<div class="admin-flash info" style="margin-bottom:0.75rem">Drag-to-reorder is disabled while a search or category filter is active. <a href="programs.php" style="color:inherit;text-decoration:underline">Clear the filter</a> to rearrange programs.</div>
+<?php endif; ?>
 <div class="admin-card" style="padding:0;overflow:auto">
   <table class="admin-table">
     <thead>
       <tr>
+<?php if ($canReorder): ?>
+        <th style="width:36px" aria-label="Drag to reorder"></th>
+<?php endif; ?>
         <th style="width:60px">Sort</th>
         <th>Title</th>
         <th>Category</th>
@@ -205,12 +253,15 @@ $rows = $stmt->fetchAll();
         <th class="col-actions">Actions</th>
       </tr>
     </thead>
-    <tbody>
+    <tbody<?= $canReorder ? ' data-reorder data-reorder-url="programs.php" data-reorder-item="tr[data-id]"' : '' ?>>
 <?php if (!$rows): ?>
-      <tr><td colspan="7" style="text-align:center;color:var(--admin-muted);padding:2rem">No programs match.</td></tr>
+      <tr><td colspan="<?= $canReorder ? 8 : 7 ?>" style="text-align:center;color:var(--admin-muted);padding:2rem">No programs match.</td></tr>
 <?php else: foreach ($rows as $r): ?>
-      <tr>
-        <td><?= (int)$r['sort_order'] ?></td>
+      <tr<?= $canReorder ? ' data-id="' . (int)$r['id'] . '"' : '' ?>>
+<?php if ($canReorder): ?>
+        <td class="col-handle"><span class="drag-handle" role="button" aria-label="Drag to reorder" title="Drag to reorder"><svg viewBox="0 0 24 24" aria-hidden="true" width="16" height="16"><path fill="currentColor" d="M9 5h2v2H9V5Zm4 0h2v2h-2V5ZM9 11h2v2H9v-2Zm4 0h2v2h-2v-2ZM9 17h2v2H9v-2Zm4 0h2v2h-2v-2Z"/></svg></span></td>
+<?php endif; ?>
+        <td<?= $canReorder ? ' data-sort-label' : '' ?>><?= (int)$r['sort_order'] ?></td>
         <td>
           <strong><?= e($r['title']) ?></strong>
           <div style="color:var(--admin-muted);font-size:0.8125rem;margin-top:0.125rem"><?= e(mb_strimwidth($r['description'], 0, 110, '…')) ?></div>
