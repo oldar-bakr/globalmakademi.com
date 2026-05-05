@@ -57,13 +57,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sign in — Makademi Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/admin.css">
 </head>
 <body class="admin">
   <div class="login-shell">
     <div class="login-card">
-      <h1>Makademi Admin</h1>
-      <p class="sub">Sign in to manage programs and gallery.</p>
+      <div class="login-brand">
+        <span class="logo">M</span>
+        <div>
+          <h1>Makademi Admin</h1>
+          <p class="sub">Sign in to manage programs and gallery</p>
+        </div>
+      </div>
 <?php if ($err): ?>
       <div class="admin-flash error"><?= e($err) ?></div>
 <?php endif; ?>
@@ -81,6 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <button type="submit" class="btn-admin primary">Sign in</button>
         </div>
       </form>
+      <div class="login-foot">Makademi Training &amp; Consultancy Ltd</div>
     </div>
   </div>
 </body>
