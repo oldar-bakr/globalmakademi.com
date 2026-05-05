@@ -14,17 +14,14 @@ if (!in_array($basename, $publicAdminPages, true)) {
 }
 
 $active = $active_admin_nav ?? '';
-function _adm_nav(string $key, string $a): string { return $key === $a ? 'active' : ''; }
-function _adm_crumb(string $a): string {
-    return match ($a) {
-        'dashboard' => 'Dashboard',
-        'programs'  => 'Programs',
-        'gallery'   => 'Gallery',
-        default     => 'Admin',
-    };
-}
+function _adm_nav(string $key, string $a): string { return $key === $a ? 'is-active' : ''; }
 $me = current_admin();
-$initial = strtoupper(substr($me['username'] ?? 'A', 0, 1));
+
+$nav_items = [
+    ['key' => 'dashboard', 'href' => 'index.php',    'label' => 'Dashboard', 'icon' => 'M3 12h6V3H3v9Zm0 9h6v-7H3v7Zm8 0h10v-9H11v9Zm0-18v7h10V3H11Z'],
+    ['key' => 'programs',  'href' => 'programs.php', 'label' => 'Programs',  'icon' => 'M4 4h16v4H4V4Zm0 6h16v4H4v-4Zm0 6h16v4H4v-4Z'],
+    ['key' => 'gallery',   'href' => 'gallery.php',  'label' => 'Gallery',   'icon' => 'M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5Zm2 12 4-5 3 4 2-2 3 4H6Zm9-8a2 2 0 1 1 0-4 2 2 0 0 1 0 4Z'],
+];
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32,67 +29,51 @@ $initial = strtoupper(substr($me['username'] ?? 'A', 0, 1));
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><?= e($admin_page_title ?? 'Makademi Admin') ?></title>
   <link rel="icon" href="../favicon.ico" sizes="48x48">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/admin.css">
 </head>
 <body class="admin">
   <div class="admin-shell">
-
-    <aside class="admin-sidebar">
-      <div class="brand-block">
-        <a href="index.php" class="brand-mark">
-          <span class="logo">M</span>
-          <span class="name">Makademi<small>Content Manager</small></span>
+    <aside class="admin-sidebar" aria-label="Primary navigation">
+      <a href="index.php" class="brand">
+        <span class="brand-mark" aria-hidden="true">M</span>
+        <span class="brand-text">
+          <strong>Makademi</strong>
+          <small>Content Manager</small>
+        </span>
+      </a>
+      <nav class="admin-nav">
+<?php foreach ($nav_items as $item): ?>
+        <a href="<?= e($item['href']) ?>" class="nav-link <?= _adm_nav($item['key'], $active) ?>">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="<?= e($item['icon']) ?>"/></svg>
+          <span><?= e($item['label']) ?></span>
         </a>
-      </div>
-
-      <div class="nav-label">Manage</div>
-      <nav>
-        <a href="index.php" class="<?= _adm_nav('dashboard', $active) ?>">
-          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
-          Dashboard
-        </a>
-        <a href="programs.php" class="<?= _adm_nav('programs', $active) ?>">
-          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-          Programs
-        </a>
-        <a href="gallery.php" class="<?= _adm_nav('gallery', $active) ?>">
-          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.5-3.5L9 20"/></svg>
-          Gallery
-        </a>
+<?php endforeach; ?>
       </nav>
-
-      <div class="side-foot">
-        Edits go live instantly on the public site.<br>
-        <a href="../index.html" target="_blank" rel="noopener">Open public site →</a>
+      <div class="sidebar-foot">
+        <a href="../index.html" target="_blank" rel="noopener" class="ghost-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3h7v7h-2V6.4L10.7 14.7l-1.4-1.4L17.6 5H14V3ZM5 5h6v2H7v10h10v-4h2v6H5V5Z"/></svg>
+          View public site
+        </a>
       </div>
     </aside>
 
-    <header class="admin-topbar">
-      <div class="crumbs">
-        <span>Makademi Admin</span>
-        <span>›</span>
-        <strong><?= e(_adm_crumb($active)) ?></strong>
-      </div>
-      <div class="meta">
-        <a class="view-site" href="../index.html" target="_blank" rel="noopener">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-          <span>View site</span>
-        </a>
-        <span class="who">
-          <span class="avatar"><?= e($initial) ?></span>
-          <span>Hi, <?= e($me['username']) ?></span>
-        </span>
-        <form method="post" action="logout.php" class="logout-form">
-          <?= csrf_field() ?>
-          <button type="submit" class="link-button">Sign out</button>
-        </form>
-      </div>
-    </header>
-
-    <main class="admin-main">
+    <div class="admin-content">
+      <header class="admin-topbar">
+        <button type="button" class="menu-toggle" aria-label="Toggle navigation" onclick="document.body.classList.toggle('nav-open')">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18v2H3V6Zm0 5h18v2H3v-2Zm0 5h18v2H3v-2Z"/></svg>
+        </button>
+        <div class="topbar-title"><?= e($admin_page_heading ?? ucfirst($active ?: 'Admin')) ?></div>
+        <div class="topbar-meta">
+<?php if ($me): ?>
+          <span class="who">Signed in as <strong><?= e($me['username']) ?></strong></span>
+          <form method="post" action="logout.php" class="logout-form">
+            <?= csrf_field() ?>
+            <button type="submit" class="btn-admin ghost small">Sign out</button>
+          </form>
+<?php endif; ?>
+        </div>
+      </header>
+      <main class="admin-main">
 <?php
 foreach (flash_take() as $f) {
     $kind = in_array($f['kind'], ['success','error','info'], true) ? $f['kind'] : 'info';

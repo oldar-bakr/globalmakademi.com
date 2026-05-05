@@ -163,7 +163,7 @@ $badgeChoices = ['engineering','maintenance','finance','telecom','fire','hse','c
 
 ?>
 <h1>Gallery</h1>
-<p style="color:var(--admin-muted);margin-top:-0.5rem">Manage the photos that appear on the public Gallery page. Photos are saved to <code>assets/images/gallery/</code>.</p>
+<p>Manage the photos that appear on the public Gallery page. Photos are saved to <code>assets/images/gallery/</code>.</p>
 
 <div class="admin-card">
   <h2 style="margin-top:0">Add a new gallery category</h2>
@@ -237,12 +237,12 @@ $badgeChoices = ['engineering','maintenance','finance','telecom','fire','hse','c
   <div class="gallery-grid">
 <?php foreach ($images as $img): $src = '../' . $urlPrefix . '/' . rawurlencode($img['filename']); ?>
     <div class="gallery-thumb">
-      <img src="<?= e($src) ?>" alt="<?= e($img['caption']) ?>">
+      <img src="<?= e($src) ?>" alt="<?= e($img['caption']) ?>" loading="lazy">
       <div class="meta">
         <div class="cap"><?= e($img['caption'] !== '' ? $img['caption'] : '(no caption)') ?></div>
         <details>
-          <summary style="cursor:pointer;font-size:0.8125rem">Edit caption</summary>
-          <form method="post" style="margin-top:0.5rem;display:flex;gap:0.25rem">
+          <summary>Edit caption</summary>
+          <form method="post" style="display:flex;gap:0.3rem">
             <?= csrf_field() ?>
             <input type="hidden" name="do" value="update_caption">
             <input type="hidden" name="id" value="<?= (int)$img['id'] ?>">
@@ -250,20 +250,23 @@ $badgeChoices = ['engineering','maintenance','finance','telecom','fire','hse','c
             <button type="submit" class="btn-admin small primary">Save</button>
           </form>
         </details>
-        <form method="post" onsubmit="return confirm('Delete this photo?')" style="margin-top:0.5rem">
-          <?= csrf_field() ?>
-          <input type="hidden" name="do" value="delete_photo">
-          <input type="hidden" name="id" value="<?= (int)$img['id'] ?>">
-          <button type="submit" class="btn-admin small danger">Delete photo</button>
-        </form>
+        <div class="row-actions">
+          <span style="font-size:0.7rem;color:var(--admin-subtle);text-transform:uppercase;letter-spacing:0.05em">#<?= (int)$img['sort_order'] + 1 ?></span>
+          <form method="post" onsubmit="return confirm('Delete this photo?')">
+            <?= csrf_field() ?>
+            <input type="hidden" name="do" value="delete_photo">
+            <input type="hidden" name="id" value="<?= (int)$img['id'] ?>">
+            <button type="submit" class="btn-admin small danger">Delete</button>
+          </form>
+        </div>
       </div>
     </div>
 <?php endforeach; ?>
   </div>
 <?php endif; ?>
 
-  <h3 style="margin:1.5rem 0 0.5rem;font-size:0.9375rem;color:var(--admin-muted);text-transform:uppercase;letter-spacing:0.5px">Upload a new photo</h3>
-  <form method="post" enctype="multipart/form-data" class="admin-form">
+  <h3 style="margin:1.5rem 0 0.5rem;font-size:0.8125rem;color:var(--admin-muted);text-transform:uppercase;letter-spacing:0.06em;font-weight:600">Upload a new photo</h3>
+  <form method="post" enctype="multipart/form-data" class="admin-form gallery-upload">
     <?= csrf_field() ?>
     <input type="hidden" name="do" value="upload_photo">
     <input type="hidden" name="gallery_category_id" value="<?= (int)$cat['id'] ?>">

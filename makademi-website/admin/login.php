@@ -57,21 +57,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sign in — Makademi Admin</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" href="../favicon.ico" sizes="48x48">
   <link rel="stylesheet" href="../assets/css/admin.css">
 </head>
 <body class="admin">
   <div class="login-shell">
     <div class="login-card">
       <div class="login-brand">
-        <span class="logo">M</span>
-        <div>
-          <h1>Makademi Admin</h1>
-          <p class="sub">Sign in to manage programs and gallery</p>
-        </div>
+        <span class="mark" aria-hidden="true">M</span>
+        <span class="text">
+          <strong>Makademi</strong>
+          <small>Content Manager</small>
+        </span>
       </div>
+      <h1>Welcome back</h1>
+      <p class="sub">Sign in to manage programs and gallery photos.</p>
 <?php if ($err): ?>
       <div class="admin-flash error"><?= e($err) ?></div>
 <?php endif; ?>
@@ -89,7 +89,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <button type="submit" class="btn-admin primary">Sign in</button>
         </div>
       </form>
-      <div class="login-foot">Makademi Training &amp; Consultancy Ltd</div>
+<?php if (is_dev_sqlite()): ?>
+      <div class="dev-hint">
+        <strong>Local dev login:</strong> use
+        <code><?= e(DEV_ADMIN_USERNAME) ?></code> / <code><?= e(DEV_ADMIN_PASSWORD) ?></code>.
+        These are seeded automatically in Replit and never deployed to Hostinger.
+      </div>
+<?php endif; ?>
     </div>
   </div>
 </body>

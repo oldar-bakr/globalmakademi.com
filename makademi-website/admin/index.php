@@ -15,7 +15,7 @@ $counts = [
 ];
 ?>
 <h1>Dashboard</h1>
-<p style="color:var(--admin-muted);margin-top:-0.5rem">Welcome back. Use the sections below to manage what visitors see on your Makademi site.</p>
+<p>Welcome back. Use the sections below to manage what visitors see on your Makademi site.</p>
 
 <div class="admin-stats">
   <div class="admin-stat"><div class="num"><?= $counts['programs'] ?></div><div class="label">Programs total</div></div>

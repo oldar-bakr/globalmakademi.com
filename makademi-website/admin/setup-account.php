@@ -121,21 +121,20 @@ $admin_page_title = 'First-time admin setup';
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>First-time setup — Makademi Admin</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/admin.css">
 </head>
 <body class="admin">
   <div class="login-shell">
-    <div class="login-card wide">
+    <div class="login-card">
       <div class="login-brand">
-        <span class="logo">M</span>
-        <div>
-          <h1>First-time admin setup</h1>
-          <p class="sub">Create the single admin account for your Makademi site. This page locks itself once the account is created.</p>
-        </div>
+        <span class="mark" aria-hidden="true">M</span>
+        <span class="text">
+          <strong>Makademi</strong>
+          <small>Content Manager</small>
+        </span>
       </div>
+      <h1>First-time admin setup</h1>
+      <p class="sub">Create the single admin account that manages your Makademi site. This page disables itself after the account is created.</p>
 
 <?php if ($done): ?>
       <div class="admin-flash success">
